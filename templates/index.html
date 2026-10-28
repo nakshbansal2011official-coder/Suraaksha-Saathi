@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surakshaa Saathi — National Cyber Safety & Public Defense Platform</title>
+  <meta name="description" content="Surakshaa Saathi: India's premier public cyber awareness website. Learn 250+ scams, take daily IST quizzes, download official certificates, and talk to the Cyber Guide AI.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            midnight: '#0A0E27',
+            deepdark: '#070A1E',
+            electricviolet: '#7C3AED',
+            emeraldsafety: '#10B981',
+            luminousteal: '#06B6D4',
+            warmamber: '#F59E0B',
+            safecoral: '#F43F5E'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- jsPDF & Canvas Confetti for Certificates -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="bg-[#0A0E27] text-slate-100 min-h-screen relative flex flex-col font-sans selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- 3D Moving Canvas Background Layer -->
+  <canvas id="surakshaa-3d-canvas"></canvas>
+
+  <!-- Content Layer -->
+  <div class="content-layer flex-1 flex flex-col">
+
+    <!-- Top Emergency Helpline Banner -->
+    <div class="bg-gradient-to-r from-rose-950/90 via-slate-900/90 to-amber-950/90 border-b border-rose-500/30 px-4 py-2 text-center text-xs sm:text-sm font-medium backdrop-blur-md sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+        <div class="flex items-center gap-2 text-rose-300 mx-auto sm:mx-0">
+          <span class="animate-pulse">🚨</span>
+          <span><strong>Emergency Cyber Fraud Notice:</strong> Faced unauthorized UPI/bank debit? Call National Helpline <strong class="text-white bg-rose-600 px-1.5 py-0.5 rounded font-mono font-bold">1930</strong> within 2 hours.</span>
+        </div>
+        <div class="flex items-center gap-3 text-xs mx-auto sm:mx-0">
+          <a href="https://cybercrime.gov.in" target="_blank" class="text-cyan-400 hover:underline">cybercrime.gov.in ↗</a>
+          <span class="text-slate-500">|</span>
+          <button id="toggle-reduced-motion-btn" class="text-slate-400 hover:text-white transition-colors">
+            ✨ Motion: Active
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="glass-panel border-b border-white/10 sticky top-[37px] z-40 backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="window.app.switchTab('home')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-violet-600 to-emerald-400 p-0.5 shadow-lg shadow-cyan-500/20">
+            <div class="w-full h-full bg-[#0A0E27] rounded-[10px] flex items-center justify-center font-bold text-cyan-400 text-lg">
+              🛡️
+            </div>
+          </div>
+          <div>
+            <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-2">
+              <span>Surakshaa Saathi</span>
+              <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 bg-cyan-500/20 text-cyan-300 rounded border border-cyan-500/30">Bharat</span>
+            </h1>
+            <p class="text-[10px] text-slate-400 tracking-wide" data-i18n="tagline">Stay Aware. Stay Secure. Stay Ahead.</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Destinations -->
+        <nav class="hidden lg:flex items-center gap-1">
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-cyan-400 bg-white/5" data-tab="home" data-i18n="nav_home">Home</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-slate-300 hover:text-white hover:bg-white/5" data-tab="scenarios" data-i18n="nav_scenarios">Learn Frauds</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-slate-300 hover:text-white hover:bg-white/5" data-tab="quiz" data-i18n="nav_quiz">Daily Quiz</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-slate-300 hover:text-white hover:bg-white/5" data-tab="posters" data-i18n="nav_posters">Safety Posters</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-slate-300 hover:text-white hover:bg-white/5" data-tab="chatbot" data-i18n="nav_chatbot">Cyber Guide AI</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-slate-300 hover:text-white hover:bg-white/5" data-tab="help" data-i18n="nav_help">Helplines</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-slate-300 hover:text-white hover:bg-white/5" data-tab="reviews" data-i18n="nav_reviews">Reviews</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-slate-300 hover:text-white hover:bg-white/5" data-tab="profile" data-i18n="nav_profile">Profile</button>
+          <button class="nav-link-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-smooth text-amber-400 hover:bg-amber-500/10" data-tab="admin" data-i18n="nav_admin">Admin 🔒</button>
+        </nav>
+
+        <!-- Right Side: 13 Languages Selector & User Badge -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <!-- 13 Languages Selector -->
+          <div class="relative">
+            <select id="lang-select-dropdown" class="bg-slate-900 border border-slate-700 text-cyan-300 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-medium">
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="bn">বাংলা (Bengali)</option>
+              <option value="te">తెలుగు (Telugu)</option>
+              <option value="mr">मराठी (Marathi)</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+              <option value="ur">اردو (Urdu)</option>
+              <option value="gu">ગુજરાતી (Gujarati)</option>
+              <option value="kn">ಕನ್ನಡ (Kannada)</option>
+              <option value="or">ଓଡ଼ିଆ (Odia)</option>
+              <option value="ml">മലയാളം (Malayalam)</option>
+              <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+              <option value="as">অসমীয়া (Assamese)</option>
+              <option value="sa">संस्कृतम् (Sanskrit)</option>
+            </select>
+          </div>
+
+          <!-- User Badge -->
+          <div id="nav-user-badge" class="hidden sm:flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-xs font-semibold text-cyan-300 cursor-pointer" onclick="window.app.switchTab('profile')">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="nav-user-name" class="truncate max-w-[100px]">Citizen</span>
+          </div>
+
+          <!-- Mobile Hamburger Menu Button -->
+          <button id="mobile-menu-toggle" class="lg:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-nav-drawer" class="fixed inset-0 bg-slate-950/90 backdrop-blur-2xl z-50 p-6 flex flex-col justify-between hidden lg:hidden">
+      <div>
+        <div class="flex items-center justify-between pb-6 border-b border-white/10">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🛡️</span>
+            <span class="font-bold text-white text-lg">Surakshaa Saathi</span>
+          </div>
+          <button id="close-drawer-btn" class="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-xl font-bold">
+            &times;
+          </button>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mt-6">
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="home" data-i18n="nav_home">Home</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="scenarios" data-i18n="nav_scenarios">Learn Frauds</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="quiz" data-i18n="nav_quiz">Daily Quiz</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="posters" data-i18n="nav_posters">Posters</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="chatbot" data-i18n="nav_chatbot">Cyber Guide AI</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="help" data-i18n="nav_help">Helplines</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="reviews" data-i18n="nav_reviews">Reviews</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-white/5 text-left text-sm font-semibold" data-tab="profile" data-i18n="nav_profile">Profile</button>
+          <button class="nav-link-btn p-3 rounded-xl bg-amber-500/20 text-amber-300 text-left text-sm font-semibold col-span-2" data-tab="admin" data-i18n="nav_admin">Admin Dashboard 🔒</button>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-white/10 text-xs text-slate-400 text-center">
+        National Cyber Safety Initiative • Helpline 1930
+      </div>
+    </div>
+
+    <!-- MAIN BODY SECTIONS -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+      <!-- ================= 1. HOME SECTION ================= -->
+      <section id="section-home" class="page-section">
+        <!-- Hero Section -->
+        <div class="relative rounded-3xl p-6 sm:p-12 lg:p-16 overflow-hidden glass-panel-elevated mb-12">
+          <div class="max-w-3xl relative z-10">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-6">
+              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+              <span data-i18n="hero_badge">National Cyber Security & Public Safety Initiative</span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6">
+              Stay Aware.<br>
+              <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">Stay Secure. Stay Ahead.</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl" data-i18n="hero_desc">
+              Your comprehensive national shield against UPI frauds, fake payment screenshots, Digital Arrest extortion, and AI deepfakes. Take daily quizzes, download verified certificates, and empower your family.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-4">
+              <button id="hero-get-started-btn" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-sm sm:text-base shadow-xl shadow-cyan-500/25 transition-smooth hover:scale-105 flex items-center gap-2" data-i18n="btn_start">
+                <span>Get Started Now</span>
+                <span>→</span>
+              </button>
+              <button id="hero-explore-scenarios-btn" class="px-6 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-semibold text-sm sm:text-base transition-smooth hover:border-cyan-400" data-i18n="btn_explore_scenarios">
+                Explore 250+ Scams
+              </button>
+              <button id="hero-chat-guide-btn" class="px-6 py-3.5 rounded-2xl bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/40 text-violet-300 font-semibold text-sm sm:text-base transition-smooth flex items-center gap-2" data-i18n="btn_chat_guide">
+                <span>Ask Cyber Guide AI 🤖</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Decorative Floating Metrics Cards -->
+          <div class="mt-10 pt-8 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div class="p-4 rounded-xl bg-black/20 border border-white/5">
+              <span class="text-2xl sm:text-3xl font-black text-cyan-400">280+</span>
+              <p class="text-xs text-slate-400 mt-1">Real Scam Scenarios</p>
+            </div>
+            <div class="p-4 rounded-xl bg-black/20 border border-white/5">
+              <span class="text-2xl sm:text-3xl font-black text-violet-400">13</span>
+              <p class="text-xs text-slate-400 mt-1">Indian Languages</p>
+            </div>
+            <div class="p-4 rounded-xl bg-black/20 border border-white/5">
+              <span class="text-2xl sm:text-3xl font-black text-emerald-400">IST Daily</span>
+              <p class="text-xs text-slate-400 mt-1">Quiz & Certificates</p>
+            </div>
+            <div class="p-4 rounded-xl bg-black/20 border border-white/5">
+              <span class="text-2xl sm:text-3xl font-black text-amber-400">1930</span>
+              <p class="text-xs text-slate-400 mt-1">Emergency Helpline</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cyber Safety Tip of the Day Feature Card -->
+        <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-500/10 via-slate-900/90 to-cyan-500/10 border border-amber-500/30 backdrop-blur-xl shadow-xl mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 text-2xl font-bold">
+              💡
+            </div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs uppercase font-bold text-amber-400 tracking-wider" data-i18n="tip_heading">Cyber Safety Tip of the Day</span>
+                <span id="daily-tip-topic" class="text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-slate-300 font-mono">General</span>
+              </div>
+              <h3 id="daily-tip-title" class="text-lg font-bold text-white mb-1">The Golden Rule of UPI</h3>
+              <p id="daily-tip-text" class="text-sm text-slate-200 leading-relaxed font-medium">
+                UPI PIN is only used for sending money or checking your balance. You NEVER need to enter a PIN or scan a QR code to receive money.
+              </p>
+              <p id="daily-tip-explanation" class="text-xs text-slate-400 mt-1">
+                If someone claims they are sending you an advance and tells you to scan a QR code, decline immediately.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <button id="share-daily-tip-btn" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-all">
+              Share Tip 🔗
+            </button>
+            <button onclick="window.app.switchTab('scenarios')" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 font-semibold text-xs transition-all">
+              Related Scenarios →
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Feature Columns -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <!-- Col 1: Daily Quiz & Certificates -->
+          <div class="glass-panel p-6 rounded-3xl border border-white/10 hover:border-cyan-500/50 transition-all group">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+              🎓
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Daily Quiz & Certificates</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              Test your scam identification knowledge every day in the Asia/Kolkata cycle. Complete the quiz to automatically earn and download an official Certificate of Appreciation or Participation.
+            </p>
+            <button onclick="window.app.switchTab('quiz')" class="text-xs font-bold text-cyan-400 hover:underline">
+              Start Today's Quiz →
+            </button>
+          </div>
+
+          <!-- Col 2: 250+ Scenarios Library -->
+          <div class="glass-panel p-6 rounded-3xl border border-white/10 hover:border-violet-500/50 transition-all group">
+            <div class="w-12 h-12 rounded-2xl bg-violet-500/20 text-violet-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+              🔍
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">250+ Scam Scenarios Library</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              Explore real-world defensive breakdowns covering Banking, QR codes, Digital Arrest, courier parcel traps, fake jobs, and senior citizen safety. Search and filter with ease.
+            </p>
+            <button onclick="window.app.switchTab('scenarios')" class="text-xs font-bold text-violet-400 hover:underline">
+              Browse Library →
+            </button>
+          </div>
+
+          <!-- Col 3: Host Poster Gallery -->
+          <div class="glass-panel p-6 rounded-3xl border border-white/10 hover:border-emerald-500/50 transition-all group">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+              🖼️
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Host Safety Posters Gallery</h3>
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              High-resolution cybersecurity awareness graphics curated and verified by authorized hosts. Download crystal-clear PNG files for schools, offices, and residential notice boards.
+            </p>
+            <button onclick="window.app.switchTab('posters')" class="text-xs font-bold text-emerald-400 hover:underline">
+              Download Posters →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. SCENARIOS LIBRARY SECTION ================= -->
+      <section id="section-scenarios" class="page-section hidden">
+        <div class="mb-8">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Educational Knowledgebase</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white" data-i18n="scenarios_heading">
+            Learn About Online Frauds and Scams
+          </h2>
+          <p class="text-sm text-slate-400 max-w-2xl mt-1" data-i18n="scenarios_sub">
+            Over 250 distinct, verified scam scenarios with step-by-step defensive guidance, psychological manipulation techniques, and official reporting methods.
+          </p>
+        </div>
+
+        <!-- Search & Filter Controls Bar -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/10 mb-8 grid grid-cols-1 sm:grid-cols-12 gap-3">
+          <!-- Search input -->
+          <div class="sm:col-span-6 relative">
+            <input 
+              id="scenarios-search-input" 
+              type="text" 
+              placeholder="Search scams by title, keyword (e.g. UPI, QR, Skype, Job, SIM)..."
+              class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          </div>
+          <!-- Category selector -->
+          <div class="sm:col-span-3">
+            <select id="scenarios-category-select" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500">
+              <option value="All">All Categories (22+)</option>
+              <option value="Banking and UPI">Banking and UPI</option>
+              <option value="QR-code and Payment Fraud">QR-code and Payment Fraud</option>
+              <option value="Digital Arrest">Digital Arrest</option>
+              <option value="Phishing and Fake Websites">Phishing & Fake Websites</option>
+              <option value="Social Media Scams">Social Media Scams</option>
+              <option value="Employment and Job Offers">Employment & Job Offers</option>
+              <option value="Investment and Cryptocurrency">Investment & Crypto</option>
+              <option value="Loan and Financial Services">Loan & Financial Apps</option>
+              <option value="Family and Senior-Citizen Safety">Senior Citizen Safety</option>
+              <option value="School and Student Scams">School & Student Scams</option>
+              <option value="Parcel and Courier Fraud">Parcel & Courier Fraud</option>
+              <option value="Deepfake and AI Impersonation">Deepfake & AI Fraud</option>
+              <option value="Recovery Scams">Recovery Scams</option>
+            </select>
+          </div>
+          <!-- Risk level selector -->
+          <div class="sm:col-span-3">
+            <select id="scenarios-risk-select" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500">
+              <option value="All">All Risk Levels</option>
+              <option value="Critical">Critical Risk (Severe Financial)</option>
+              <option value="High">High Risk</option>
+              <option value="Medium">Medium Risk</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Scenarios Grid -->
+        <div id="scenarios-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated by scenarios.js -->
+        </div>
+
+        <!-- Pagination -->
+        <div id="scenarios-pagination"></div>
+      </section>
+
+      <!-- ================= 3. DAILY QUIZ SECTION ================= -->
+      <section id="section-quiz" class="page-section hidden">
+        <div class="max-w-3xl mx-auto">
+          <!-- Quiz Header -->
+          <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-3">
+              <span id="quiz-ist-date-badge">Today: IST Cycle</span>
+            </div>
+            <h2 class="text-3xl font-black text-white" data-i18n="quiz_heading">
+              Daily Cyber-Awareness Examination
+            </h2>
+            <p class="text-sm text-slate-400 mt-2" data-i18n="quiz_sub">
+              India Standard Time (Asia/Kolkata) schedule. Strictly one attempt per participant per day.
+            </p>
+          </div>
+
+          <!-- Quiz Interactive Card Container -->
+          <div id="quiz-card-container">
+            <!-- Populated by quiz.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. CYBER GUIDE CHATBOT SECTION ================= -->
+      <section id="section-chatbot" class="page-section hidden">
+        <div class="max-w-4xl mx-auto">
+          <!-- Chat Header -->
+          <div class="glass-panel p-6 rounded-3xl border border-white/10 mb-6 flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-violet-600 flex items-center justify-center text-slate-950 font-bold text-lg shadow-lg">
+                🤖
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-white">Surakshaa Saathi Cyber Guide</h2>
+                <p class="text-xs text-slate-400">Intelligent Multilingual Cyber Safety Assistant • Helpline 1930 Triage</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="chat-new-btn" class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">
+                + New Chat
+              </button>
+            </div>
+          </div>
+
+          <!-- Suggested Quick Prompts -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            <button class="quick-prompt-pill px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-cyan-300 hover:border-cyan-500 transition-colors" data-prompt="I received a video call from an alleged police officer placing me under 'Digital Arrest'. What should I do?">
+              🛡️ Digital Arrest Call
+            </button>
+            <button class="quick-prompt-pill px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-cyan-300 hover:border-cyan-500 transition-colors" data-prompt="A buyer wants to send me money and is asking me to scan a QR code in PhonePe. Is this safe?">
+              💳 QR Code Receive Money Scam
+            </button>
+            <button class="quick-prompt-pill px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-cyan-300 hover:border-cyan-500 transition-colors" data-prompt="I got an SMS threatening electricity disconnection at 9:30 PM with a phone number to call.">
+              ⚡ Electricity Bill Threat
+            </button>
+            <button class="quick-prompt-pill px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:text-cyan-300 hover:border-cyan-500 transition-colors" data-prompt="I lost money in an unauthorized UPI debit transaction just now. What is the emergency step?">
+              🚨 Emergency: Money Stolen via UPI
+            </button>
+          </div>
+
+          <!-- Chat Messages Scroll Container -->
+          <div class="glass-panel rounded-3xl border border-white/10 p-6 flex flex-col h-[520px]">
+            <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 pr-2">
+              <!-- Welcome Initial Message -->
+              <div class="flex justify-start">
+                <div class="flex gap-3 max-w-2xl bg-slate-900/80 border border-slate-700/60 p-4 rounded-2xl rounded-tl-sm text-slate-100 shadow-md">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-teal-500 text-slate-950 flex items-center justify-center shrink-0 font-bold text-xs">
+                    SS
+                  </div>
+                  <div>
+                    <span class="text-xs font-semibold text-cyan-400 block mb-1">Surakshaa Saathi Cyber Guide</span>
+                    <p class="text-sm leading-relaxed text-slate-200">
+                      Namaste! I am your AI Cyber Safety Assistant. How can I help protect you today? You can describe a suspicious incident, ask about UPI security, check unfamiliar messages, or upload a screenshot for inspection.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Attachment preview pill -->
+            <div id="chat-attachment-preview" class="hidden pt-3 border-t border-white/5"></div>
+
+            <!-- Composer Input Bar -->
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
+              <!-- File / Image Upload -->
+              <label for="chat-file-upload" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-400 cursor-pointer transition-colors" title="Attach screenshot or file for scam inspection">
+                📎
+                <input id="chat-file-upload" type="file" accept="image/*,.pdf,.apk,.txt" class="hidden">
+              </label>
+
+              <!-- Voice Input Button -->
+              <button id="chat-mic-btn" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-400 transition-colors" title="Speak to Chatbot (Microphone)">
+                🎤
+              </button>
+
+              <!-- Text Input Area -->
+              <input 
+                id="chat-user-input" 
+                type="text" 
+                placeholder="Ask any cyber fraud question, describe a scam, or report an issue..."
+                class="flex-1 bg-slate-900/90 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              />
+
+              <!-- Send Button -->
+              <button id="chat-send-btn" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all">
+                Send →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. SAFETY POSTERS SECTION ================= -->
+      <section id="section-posters" class="page-section hidden">
+        <div class="mb-8">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Host Verified Media</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white" data-i18n="posters_heading">
+            Official Cyber Safety Posters Gallery
+          </h2>
+          <p class="text-sm text-slate-400 max-w-2xl mt-1" data-i18n="posters_sub">
+            Published exclusively by authorized administrators. Download clean, high-resolution PNG images for schools, residential societies, and offices.
+          </p>
+        </div>
+
+        <div id="posters-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated by posters.js -->
+        </div>
+      </section>
+
+      <!-- ================= 6. OFFICIAL HELPLINES & GUIDANCE ================= -->
+      <section id="section-help" class="page-section hidden">
+        <div class="mb-8">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">Government Authorities</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white" data-i18n="help_heading">
+            Official Indian Cyber Safety Helplines
+          </h2>
+          <p class="text-sm text-slate-400 max-w-2xl mt-1">
+            Verified contact details and emergency portals from the Ministry of Home Affairs, CERT-In, RBI, and Department of Telecommunications.
+          </p>
+        </div>
+
+        <!-- Emergency Golden Hour Card -->
+        <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-rose-950/80 via-slate-900 to-rose-950/80 border border-rose-500/40 backdrop-blur-xl shadow-2xl mb-10">
+          <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-rose-600/30 border border-rose-500 text-rose-400 flex items-center justify-center shrink-0 text-3xl font-bold">
+              ⚡
+            </div>
+            <div>
+              <span class="text-xs uppercase font-bold text-rose-400 tracking-wider">Critical Citizen Protocol</span>
+              <h3 class="text-xl sm:text-2xl font-bold text-white mt-1 mb-2">The 'Golden Hour' Financial Fraud Directive</h3>
+              <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                If you have been defrauded in an unauthorized banking, credit card, or UPI transaction, the first <strong>2 hours</strong> are crucial. Reporting promptly to Helpline <strong>1930</strong> enables the Indian Cyber Crime Coordination Centre (I4C) to trigger an automated inter-bank freeze across all downstream beneficiary accounts.
+              </p>
+              <div class="flex flex-wrap items-center gap-3">
+                <a href="tel:1930" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2">
+                  <span>📞 Call Helpline 1930 (Toll Free)</span>
+                </a>
+                <a href="https://cybercrime.gov.in" target="_blank" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/20 transition-all">
+                  Open National Reporting Portal ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid of Verified Authorities -->
+        <div id="official-resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <!-- Populated by app.js -->
+        </div>
+
+        <!-- Warning Against Recovery Scammers -->
+        <div class="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs sm:text-sm text-slate-300 leading-relaxed">
+          <strong class="text-amber-400 block mb-1">⚠️ Warning Against Secondary 'Fund Recovery' Scams:</strong>
+          Never pay any individual, self-proclaimed cyber lawyer, or hacker claiming they can recover your lost money for an advance retainer fee. Only authorized banks, law enforcement, and courts can freeze or reverse fraudulent funds.
+        </div>
+      </section>
+
+      <!-- ================= 7. REVIEWS & FEEDBACK SECTION ================= -->
+      <section id="section-reviews" class="page-section hidden">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl sm:text-3xl font-black text-white" data-i18n="reviews_heading">
+              Share Your Experience & Feedback
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">
+              Help make India cyber-safe by sharing how Surakshaa Saathi helped you or your family.
+            </p>
+          </div>
+
+          <!-- Average Rating Stats Card -->
+          <div class="glass-panel p-6 rounded-3xl border border-white/10 mb-8 flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+              <span id="reviews-avg-score" class="text-4xl sm:text-5xl font-black text-amber-400">5.0</span>
+              <div>
+                <div class="flex text-amber-400 text-lg">★★★★★</div>
+                <p id="reviews-total-count" class="text-xs text-slate-400 mt-1">Based on verified citizen experiences</p>
+              </div>
+            </div>
+            <div class="text-xs text-slate-400 italic">
+              Public Safety Initiative • 100% Non-Commercial
+            </div>
+          </div>
+
+          <!-- Review Form -->
+          <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 mb-10">
+            <h3 class="text-lg font-bold text-white mb-4">Write a Verified Review</h3>
+            <form id="review-submit-form" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">Your Full Name *</label>
+                  <input id="review-author-name" type="text" required placeholder="e.g. Ramesh Kumar" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">Your Profession (Typed Text) *</label>
+                  <input id="review-author-profession" type="text" required placeholder="e.g. High School Teacher, Student, Doctor, Homemaker" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+              </div>
+
+              <!-- Interactive Star Rating -->
+              <div>
+                <label class="text-xs font-semibold text-slate-300 block mb-1.5">Rating (1 to 5 Stars) *</label>
+                <div class="flex items-center gap-1.5 text-2xl">
+                  <button type="button" class="star-select-btn text-amber-400" data-rating="1">★</button>
+                  <button type="button" class="star-select-btn text-amber-400" data-rating="2">★</button>
+                  <button type="button" class="star-select-btn text-amber-400" data-rating="3">★</button>
+                  <button type="button" class="star-select-btn text-amber-400" data-rating="4">★</button>
+                  <button type="button" class="star-select-btn text-amber-400" data-rating="5">★</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="text-xs font-semibold text-slate-300 block mb-1">Your Detailed Experience *</label>
+                <textarea id="review-body-text" rows="3" required placeholder="Describe what you learned or how the platform helped you identify suspicious cyber activities..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-cyan-500"></textarea>
+              </div>
+
+              <div id="review-form-feedback" class="text-xs font-semibold hidden"></div>
+
+              <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 text-white font-bold text-xs shadow-md transition-all">
+                Submit Public Review
+              </button>
+            </form>
+          </div>
+
+          <!-- Public Reviews List -->
+          <div id="reviews-list-container" class="space-y-4">
+            <!-- Populated by reviews.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 8. PROFILE MANAGER SECTION ================= -->
+      <section id="section-profile" class="page-section hidden">
+        <div class="max-w-4xl mx-auto">
+          <!-- Unauthenticated View -->
+          <div id="profile-unauth-view" class="text-center p-12 glass-panel rounded-3xl border border-white/10 hidden">
+            <span class="text-4xl block mb-3">👤</span>
+            <h3 class="text-xl font-bold text-white mb-2">No Active Participant Profile</h3>
+            <p class="text-xs text-slate-400 max-w-md mx-auto mb-6">
+              Complete the quick registration without OTP verification to access your personalized quiz history, certificate records, and profile details.
+            </p>
+            <button onclick="window.app.openRegistrationModal()" class="px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs">
+              Register Participant Profile →
+            </button>
+          </div>
+
+          <!-- Authenticated Profile View -->
+          <div id="profile-auth-view" class="space-y-8">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10">
+              <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-6 flex-wrap gap-3">
+                <div>
+                  <h2 class="text-2xl font-bold text-white">Participant Profile Manager</h2>
+                  <p class="text-xs text-slate-400">Manage your details & download past examination certificates</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-400">Registered: <strong id="prof-reg-date" class="text-white">N/A</strong></span>
+                  <button id="profile-logout-btn" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-slate-300 border border-white/10">
+                    Logout
+                  </button>
+                </div>
+              </div>
+
+              <!-- Profile Fields -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">Full Name</label>
+                  <input id="prof-name-input" type="text" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">Country (Typed Text)</label>
+                  <input id="prof-country-input" type="text" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">State / UT (Typed Text)</label>
+                  <input id="prof-state-input" type="text" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">City (Typed Text)</label>
+                  <input id="prof-city-input" type="text" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">Phone Number</label>
+                  <input id="prof-phone-input" type="text" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">Email Address</label>
+                  <input id="prof-email-input" type="email" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="text-xs font-semibold text-slate-300 block mb-1">Preferred Language</label>
+                  <select id="prof-lang-select" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs focus:ring-2 focus:ring-cyan-500">
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="ur">اردو (Urdu)</option>
+                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                    <option value="as">অসমীয়া (Assamese)</option>
+                    <option value="sa">संस्कृतम् (Sanskrit)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-4 border-t border-white/10 flex-wrap gap-3">
+                <button id="profile-save-btn" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-md transition-all">
+                  Save Changes
+                </button>
+                <button id="profile-delete-btn" class="text-rose-400 hover:text-rose-300 text-xs font-semibold hover:underline">
+                  Request Account Deletion ⚠️
+                </button>
+              </div>
+            </div>
+
+            <!-- Quiz & Certificate History Table -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10">
+              <h3 class="text-lg font-bold text-white mb-4">Quiz Participation & Certificate Records</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead>
+                    <tr class="border-b border-white/10 text-[11px] uppercase tracking-wider text-slate-400">
+                      <th class="py-2 px-2">Quiz Date (IST)</th>
+                      <th class="py-2 px-2">Score</th>
+                      <th class="py-2 px-2">Certificate ID</th>
+                      <th class="py-2 px-2">Time</th>
+                      <th class="py-2 px-2">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="profile-quiz-history">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 9. SECURE ADMIN DASHBOARD SECTION ================= -->
+      <section id="section-admin" class="page-section hidden">
+        <div class="max-w-5xl mx-auto">
+          <!-- Admin Login View -->
+          <div id="admin-login-view" class="max-w-md mx-auto glass-panel p-8 rounded-3xl border border-white/10 text-center">
+            <span class="text-3xl block mb-3">🔒</span>
+            <h3 class="text-xl font-bold text-white mb-1">Host Administrator Authentication</h3>
+            <p class="text-xs text-slate-400 mb-6">Enter secure administrator credentials to manage posters, scenarios, and reviews.</p>
+            <form id="admin-login-form" class="space-y-4">
+              <input id="admin-password-input" type="password" required placeholder="Administrator Password" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:ring-2 focus:ring-cyan-500">
+              <div id="admin-login-error" class="text-rose-400 text-xs font-semibold hidden"></div>
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs shadow-md transition-all">
+                Authorize Administrator Access
+              </button>
+            </form>
+            <p class="text-[11px] text-slate-500 mt-4">Default setup credential: <code class="text-amber-400">Surakshaa@2026</code></p>
+          </div>
+
+          <!-- Authenticated Admin Dashboard View -->
+          <div id="admin-dashboard-view" class="space-y-8 hidden">
+            <!-- Header & Clock -->
+            <div class="glass-panel p-6 rounded-3xl border border-white/10 flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Host Administration Control</span>
+                <h2 class="text-2xl font-bold text-white">Surakshaa Saathi Admin Hub</h2>
+              </div>
+              <div class="flex items-center gap-3 text-xs">
+                <span id="stat-ist-clock" class="text-slate-400 font-mono"></span>
+                <button id="admin-logout-btn" class="px-3 py-1.5 rounded-lg bg-rose-600/20 text-rose-300 border border-rose-500/30">
+                  Logout Admin
+                </button>
+              </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <span class="text-xs text-slate-400 block mb-1">Participants</span>
+                <span id="stat-participants" class="text-xl font-bold text-cyan-400">0</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <span class="text-xs text-slate-400 block mb-1">Quizzes Taken</span>
+                <span id="stat-quizzes" class="text-xl font-bold text-emerald-400">0</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <span class="text-xs text-slate-400 block mb-1">Certificates</span>
+                <span id="stat-certificates" class="text-xl font-bold text-amber-400">0</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <span class="text-xs text-slate-400 block mb-1">Scenarios</span>
+                <span id="stat-scenarios" class="text-xl font-bold text-violet-400">0</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <span class="text-xs text-slate-400 block mb-1">Pending Reviews</span>
+                <span id="stat-pending-reviews" class="text-xl font-bold text-rose-400">0</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <span class="text-xs text-slate-400 block mb-1">Live Posters</span>
+                <span id="stat-posters" class="text-xl font-bold text-cyan-400">0</span>
+              </div>
+            </div>
+
+            <!-- Manage Posters Panel -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10">
+              <h3 class="text-lg font-bold text-white mb-4">Host Poster Publisher & Manager</h3>
+              
+              <!-- Form to add new poster -->
+              <form id="admin-new-poster-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 p-4 rounded-2xl bg-black/20 border border-white/5">
+                <div>
+                  <label class="text-xs text-slate-300 block mb-1">Poster Title *</label>
+                  <input id="admin-poster-title" type="text" required placeholder="e.g. UPI QR Fraud Protocol" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-300 block mb-1">Category *</label>
+                  <input id="admin-poster-cat" type="text" required placeholder="e.g. Payment Safety" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="text-xs text-slate-300 block mb-1">Description *</label>
+                  <input id="admin-poster-desc" type="text" required placeholder="Concise awareness message..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-300 block mb-1">Official Reference / Source</label>
+                  <input id="admin-poster-refs" type="text" placeholder="e.g. CERT-In Bulletin" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div class="flex items-end">
+                  <button type="submit" class="w-full py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-all">
+                    + Publish Official Poster
+                  </button>
+                </div>
+              </form>
+
+              <!-- Posters Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead>
+                    <tr class="border-b border-white/10 text-[11px] uppercase tracking-wider text-slate-400">
+                      <th class="py-2 px-2">ID</th>
+                      <th class="py-2 px-2">Title</th>
+                      <th class="py-2 px-2">Category</th>
+                      <th class="py-2 px-2">Status</th>
+                      <th class="py-2 px-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-posters-table-body">
+                    <!-- Populated by admin.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Review Moderation Panel -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10">
+              <h3 class="text-lg font-bold text-white mb-2">Review Moderation Panel</h3>
+              <p class="text-xs text-slate-400 mb-4">Moderate and manage public citizen feedback.</p>
+              <div id="admin-reviews-list" class="space-y-3">
+                <!-- Populated by admin.js -->
+              </div>
+            </div>
+
+            <!-- Settings & Password Update Panel -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10">
+              <h3 class="text-lg font-bold text-white mb-4">Administrator Settings</h3>
+              <form id="admin-settings-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-xs text-slate-300 block mb-1">Update Admin Password</label>
+                  <input id="admin-new-password" type="password" placeholder="Leave blank to keep unchanged" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-300 block mb-1">OpenAI API Key (Optional)</label>
+                  <input id="admin-openai-key" type="password" placeholder="sk-..." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs">
+                </div>
+                <div class="sm:col-span-2">
+                  <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+                    Save Admin Settings
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="glass-panel border-t border-white/10 py-10 mt-12 backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🛡️</span>
+            <div>
+              <h3 class="text-base font-bold text-white">Surakshaa Saathi</h3>
+              <p class="text-xs text-slate-400">National Cyber Safety & Digital Fraud Prevention Initiative</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-300">
+            <button onclick="window.app.switchTab('home')" class="hover:text-cyan-400">Home</button>
+            <button onclick="window.app.switchTab('scenarios')" class="hover:text-cyan-400">Scam Library</button>
+            <button onclick="window.app.switchTab('quiz')" class="hover:text-cyan-400">Daily Quiz</button>
+            <button onclick="window.app.switchTab('posters')" class="hover:text-cyan-400">Posters</button>
+            <button onclick="window.app.switchTab('help')" class="hover:text-cyan-400">Official Helplines</button>
+            <button onclick="window.app.switchTab('admin')" class="hover:text-amber-400">Admin 🔒</button>
+          </div>
+        </div>
+        <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <p>© 2026 Surakshaa Saathi. Dedicated to Public Cyber Awareness in India.</p>
+          <div class="flex items-center gap-4">
+            <a href="https://cybercrime.gov.in" target="_blank" class="hover:text-cyan-400">cybercrime.gov.in</a>
+            <span>•</span>
+            <span class="text-rose-400 font-bold">Helpline: 1930</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div> <!-- End Content Layer -->
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. Welcome & Onboarding Modal -->
+  <div id="welcome-onboarding-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="max-w-xl w-full bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button id="close-onboarding-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      
+      <!-- Step 1: Select Language from 13 Options -->
+      <div id="welcome-step-1">
+        <div class="text-center mb-6">
+          <span class="text-4xl block mb-2">🇮🇳</span>
+          <h3 class="text-2xl font-black text-white">Welcome to Surakshaa Saathi</h3>
+          <p class="text-xs text-slate-400 mt-1">Please select your preferred Indian language to begin:</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6">
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="hi">
+            हिन्दी (Hindi)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="bn">
+            বাংলা (Bengali)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="te">
+            తెలుగు (Telugu)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="mr">
+            मराठी (Marathi)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="ta">
+            தமிழ் (Tamil)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="ur">
+            اردو (Urdu)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="gu">
+            ગુજરાતી (Gujarati)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="kn">
+            ಕನ್ನಡ (Kannada)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="or">
+            ଓଡ଼ିଆ (Odia)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="ml">
+            മലയാളം (Malayalam)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="pa">
+            ਪੰਜਾਬੀ (Punjabi)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all" data-lang="as">
+            অসমীয়া (Assamese)
+          </button>
+          <button class="welcome-lang-choice p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-center text-xs font-semibold text-white transition-all col-span-2 sm:col-span-3" data-lang="sa">
+            संस्कृतम् (Sanskrit)
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Participant Registration (NO OTP) -->
+      <div id="welcome-step-2" class="hidden">
+        <div class="text-center mb-6">
+          <span class="text-3xl block mb-1">📝</span>
+          <h3 class="text-2xl font-bold text-white" data-i18n="modal_reg_title">Participant Registration</h3>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="modal_reg_subtitle">Join the safety initiative — No OTP required</p>
+        </div>
+        <form id="onboarding-reg-form" class="space-y-3.5">
+          <div>
+            <label class="text-xs text-slate-300 block mb-1" data-i18n="field_full_name">Full Name *</label>
+            <input id="reg-full-name" type="text" required placeholder="Enter your full name" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-4 py-2 text-xs">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div>
+              <label class="text-xs text-slate-300 block mb-1" data-i18n="field_country">Country (Type) *</label>
+              <input id="reg-country" type="text" required value="India" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+            </div>
+            <div>
+              <label class="text-xs text-slate-300 block mb-1" data-i18n="field_state">State / UT (Type) *</label>
+              <input id="reg-state" type="text" required placeholder="e.g. Maharashtra" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+            </div>
+            <div>
+              <label class="text-xs text-slate-300 block mb-1" data-i18n="field_city">City (Type) *</label>
+              <input id="reg-city" type="text" required placeholder="e.g. Mumbai" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-xs text-slate-300 block mb-1" data-i18n="field_phone">Phone (with country code) *</label>
+              <input id="reg-phone" type="tel" required placeholder="+91 9876543210" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+            </div>
+            <div>
+              <label class="text-xs text-slate-300 block mb-1" data-i18n="field_email">Email Address *</label>
+              <input id="reg-email" type="email" required placeholder="name@example.com" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs">
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-tight pt-1" data-i18n="reg_note">
+            Note: Instant registration without OTP. Your data is protected and used strictly for learning progress & certificate issuance.
+          </p>
+          <button id="reg-submit-btn" type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg transition-all" data-i18n="btn_submit_reg">
+            Complete Registration & Enter Platform
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Scenario Detail Modal -->
+  <div id="scenario-detail-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div id="scenario-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- 3. Certificate View & Download Modal -->
+  <div id="certificate-view-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 hidden">
+    <div class="max-w-4xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative max-h-[95vh] overflow-y-auto flex flex-col items-center">
+      <div class="w-full flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>📜 Official Cyber Awareness Certificate</span>
+        </h3>
+        <button id="close-cert-modal-btn" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center font-bold">&times;</button>
+      </div>
+
+      <!-- High-Resolution Canvas Preview -->
+      <div class="w-full overflow-hidden rounded-xl border border-white/20 shadow-2xl bg-white mb-6">
+        <canvas id="cert-preview-canvas" class="w-full h-auto block"></canvas>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button id="modal-cert-download-pdf" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg transition-all">
+          ⬇ Download Official PDF
+        </button>
+        <button id="modal-cert-download-png" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-lg transition-all">
+          🖼 Download High-Res PNG
+        </button>
+        <button id="modal-cert-send-email" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 border border-white/15 font-semibold text-xs transition-all">
+          ✉ Email Status / Retry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Poster Fullscreen View Modal -->
+  <div id="poster-fullscreen-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto text-center">
+      <button id="close-poster-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      <img id="poster-fullscreen-img" src="" alt="Poster" class="max-h-[60vh] mx-auto rounded-xl shadow-lg mb-4">
+      <h3 id="poster-fullscreen-title" class="text-lg font-bold text-white mb-1"></h3>
+      <p id="poster-fullscreen-desc" class="text-xs text-slate-400 mb-4"></p>
+      <a id="poster-fullscreen-download-btn" href="" download class="inline-block px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-md">
+        ⬇ Download Full Resolution PNG (1200x1600)
+      </a>
+    </div>
+  </div>
+
+  <!-- 5. External Exit Confirmation Modal -->
+  <div id="external-exit-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative text-center">
+      <span class="text-3xl block mb-2">🌐</span>
+      <h3 class="text-lg font-bold text-white mb-1">Leaving Surakshaa Saathi</h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4">
+        You are navigating to an official external government website:
+        <strong id="exit-authority-name" class="block text-cyan-300 mt-1"></strong>
+        <span id="exit-target-url" class="block font-mono text-[11px] text-slate-400 break-all mt-1"></span>
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button id="cancel-exit-btn" class="px-4 py-2 rounded-xl bg-white/10 text-slate-300 text-xs font-semibold hover:bg-white/15">
+          Cancel & Stay
+        </button>
+        <button id="confirm-exit-btn" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold shadow-md">
+          Proceed to Official Portal ↗
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="/static/js/i18n.js"></script>
+  <script src="/static/js/three-background.js"></script>
+  <script src="/static/js/certificate.js"></script>
+  <script src="/static/js/quiz.js"></script>
+  <script src="/static/js/chatbot.js"></script>
+  <script src="/static/js/scenarios.js"></script>
+  <script src="/static/js/reviews.js"></script>
+  <script src="/static/js/posters.js"></script>
+  <script src="/static/js/admin.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
+

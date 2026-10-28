@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.github_token
+surakshaa_saathi.db
+.vscode/
+.idea/
+*.log
