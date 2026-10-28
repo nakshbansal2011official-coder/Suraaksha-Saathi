@@ -1,10 +1,14 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.env
-.github_token
+*.py[cod]
+*$py.class
+
+# Local database
 surakshaa_saathi.db
-.vscode/
-.idea/
-*.log
+
+# Environment variables
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db

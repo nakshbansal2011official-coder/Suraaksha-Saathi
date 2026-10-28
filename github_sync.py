@@ -5,22 +5,19 @@ import base64
 import urllib.request
 import urllib.error
 
-WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-def load_token():
-    token = os.environ.get("GITHUB_TOKEN", "").strip()
-    if token:
-        return token
-    token_file = os.path.join(WORKSPACE_DIR, ".github_token")
-    if os.path.exists(token_file):
+TOKEN = os.environ.get("GITHUB_TOKEN", "")
+if not TOKEN:
+    # Read from local environment or prompt if missing
+    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if os.path.exists(env_file):
         try:
-            with open(token_file, "r", encoding="utf-8") as tf:
-                return tf.read().strip()
+            with open(env_file, "r", encoding="utf-8") as ef:
+                for line in ef:
+                    if line.startswith("GITHUB_TOKEN="):
+                        TOKEN = line.split("=", 1)[1].strip()
+                        break
         except Exception:
             pass
-    return ""
-
-TOKEN = load_token()
 OWNER = "nakshbansal2011official-coder"
 REPO = "Suraaksha-Saathi"
 BRANCH = "main"
@@ -31,6 +28,8 @@ HEADERS = {
     "Accept": "application/vnd.github.v3+json",
     "User-Agent": "SurakshaaSaathi-AutoSync"
 }
+
+WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def api_request(endpoint, data=None, method="GET"):
     url = f"{BASE_URL}/{endpoint}"
@@ -75,6 +74,7 @@ def create_blob(file_path):
 
 def collect_files():
     files_to_sync = []
+    # Ignore patterns
     ignored_dirs = {".git", "__pycache__", ".vscode", ".idea"}
     ignored_files = {".DS_Store", "surakshaa_saathi.db"}
 
@@ -99,7 +99,7 @@ def sync_to_github(commit_message="Deploy Surakshaa Saathi - National Cyber Safe
 
     tree_entries = []
     for idx, (abs_path, rel_path) in enumerate(files):
-        print(f"  [{idx+1}/{len(files)}] Uploading: {rel_path} ...", end=" ", flush=True)
+        print(f"  [{idx+1}/{len(files)}] Uploading blob: {rel_path} ...", end=" ", flush=True)
         try:
             blob_sha = create_blob(abs_path)
             tree_entries.append({
